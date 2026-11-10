@@ -1,0 +1,40 @@
+<main class="login-shell">
+  <section class="login-card" *ngIf="mode === 'choose'">
+    <img class="university-logo" src="/images/ramkhamhaeng-logo.svg" alt="ตรามหาวิทยาลัยรามคำแหง" />
+    <h1>ระบบบริหารจัดการครุภัณฑ์</h1>
+    <p class="login-subtitle login-subtitle-centered">เลือกประเภทบัญชีเพื่อเข้าสู่ระบบ</p>
+    <button class="primary-button" type="button" (click)="router.navigateByUrl('/login/admin')">เข้าสู่ระบบ Admin</button>
+    <button class="user-button" type="button" (click)="router.navigateByUrl('/login/user')">เข้าสู่ระบบ User</button>
+  </section>
+
+  <section class="login-card" *ngIf="mode === 'admin'">
+    <button class="back-link" type="button" (click)="router.navigateByUrl('/login')">← เลือกประเภทบัญชี</button>
+    <img class="university-logo" src="/images/ramkhamhaeng-logo.svg" alt="ตรามหาวิทยาลัยรามคำแหง" />
+    <h1>เข้าสู่ระบบ Admin</h1>
+
+    <form (ngSubmit)="loginAdmin()">
+      <label for="admin-email">อีเมล</label>
+      <input id="admin-email" name="adminEmail" type="email" [(ngModel)]="email" autocomplete="username" required />
+      <label for="admin-password">รหัสผ่าน</label>
+      <input id="admin-password" name="adminPassword" type="password" [(ngModel)]="password" autocomplete="current-password" required />
+      <button class="primary-button" type="submit" [disabled]="loading">{{ loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ' }}</button>
+    </form>
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </section>
+
+  <section class="login-card" *ngIf="mode === 'user'">
+    <button class="back-link" type="button" (click)="router.navigateByUrl('/login')">← เลือกประเภทบัญชี</button>
+    <img class="university-logo" src="/images/ramkhamhaeng-logo.svg" alt="ตรามหาวิทยาลัยรามคำแหง" />
+    <h1>เข้าสู่ระบบ User</h1>
+
+    <form (ngSubmit)="loginUser()">
+      <label for="user-email">อีเมล</label>
+      <input id="user-email" name="userEmail" type="email" [(ngModel)]="email" autocomplete="username" required />
+      <label for="user-password">รหัสผ่าน</label>
+      <input id="user-password" name="userPassword" type="password" [(ngModel)]="password" autocomplete="current-password" placeholder="กำหนดรหัสผ่านทดสอบ" required />
+      <button class="primary-button user-primary" type="submit" [disabled]="loading">{{ loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ' }}</button>
+    </form>
+    <p class="security-note">บัญชีทดสอบ: ice@gmail.com · รหัสผ่านทดสอบ: user1234</p>
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </section>
+</main>

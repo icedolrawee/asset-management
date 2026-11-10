@@ -1,0 +1,173 @@
+.checkout-total {
+  min-width: 150px;
+  padding: 13px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid #e7ecf3;
+  border-radius: 12px;
+}
+.checkout-total small {
+  color: #75849a;
+  font-size: 11px;
+}
+.checkout-total strong {
+  color: #1b3557;
+  font-size: 24px;
+  line-height: 1.2;
+}
+.checkout-table-card {
+  overflow: hidden;
+}
+.checkout-asset {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+}
+.checkout-thumb {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #e7ecf3;
+  border-radius: 8px;
+  background: #f7f9fc;
+  color: #8290a3;
+}
+.checkout-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.checkout-asset strong {
+  color: #263c59;
+  font-size: 12px;
+}
+.asset-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+.asset-actions button {
+  min-width: 64px;
+  padding: 8px 14px;
+  border-radius: 7px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.edit-button {
+  background: #2563eb !important;
+  border: 1px solid #2563eb !important;
+  color: #fff !important;
+}
+.edit-button:hover {
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+}
+.cancel-checkout-button {
+  background: #dc2626 !important;
+  border: 1px solid #dc2626 !important;
+  color: #fff !important;
+}
+.cancel-checkout-button:hover:not(:disabled) {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+}
+.cancel-checkout-button:disabled { opacity: .6; cursor: not-allowed; }
+.status-select {
+  max-width: 120px;
+  padding: 7px 9px;
+  border: 1px solid #dbe4ed;
+  border-radius: 7px;
+  background: #fff;
+  color: #34465c;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.status-select:focus {
+  outline: 2px solid #8aa9ca;
+  outline-offset: 1px;
+}
+.success-alert {
+  margin-bottom: 14px;
+  padding: 11px 14px;
+  border: 1px solid #b9e2ca;
+  border-radius: 8px;
+  background: #effaf3;
+  color: #237344;
+  font-size: 13px;
+}
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(18, 32, 51, .48);
+}
+.edit-modal {
+  width: min(100%, 480px);
+  padding: 24px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 55px rgba(14, 30, 50, .22);
+}
+.modal-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.modal-heading h2 { margin: 0; color: #1b3557; font-size: 19px; }
+.modal-heading p { margin: 6px 0 0; color: #75849a; font-size: 12px; }
+.modal-close {
+  border: 0;
+  background: transparent;
+  color: #738197;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+}
+.edit-modal form { display: grid; gap: 14px; }
+.edit-modal label { display: grid; gap: 6px; color: #344861; font-size: 12px; font-weight: 600; }
+.edit-modal input,
+.edit-modal select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d8e0eb;
+  border-radius: 7px;
+  color: #263c59;
+  font: inherit;
+  font-size: 13px;
+}
+.edit-modal input:focus,
+.edit-modal select:focus { outline: 2px solid #c9dcf7; border-color: #719bd0; }
+.edit-error { margin: 0; color: #c0392b; font-size: 12px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 8px; }
+.cancel-btn, .save-btn {
+  padding: 9px 15px;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cancel-btn { border: 1px solid #d8e0eb; background: #fff; color: #52647b; }
+.save-btn { border: 1px solid #245b9b; background: #245b9b; color: #fff; }
+.cancel-btn:disabled, .save-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+@media (max-width: 760px) {
+  .checkout-total { width: 100%; }
+  .edit-modal { padding: 19px; }
+}

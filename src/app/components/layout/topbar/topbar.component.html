@@ -1,0 +1,46 @@
+<header class="topbar">
+  <div class="topbar-actions">
+    <div class="profile-menu">
+      <button type="button" class="profile-trigger" [attr.aria-expanded]="isProfileOpen" aria-haspopup="true"
+        aria-label="เปิดข้อมูลโปรไฟล์ผู้ใช้งาน" (click)="toggleProfile()">
+        <span class="profile-avatar">
+          <img *ngIf="avatarUrl; else triggerInitial" [src]="avatarUrl" alt="รูปโปรไฟล์" />
+          <ng-template #triggerInitial>{{ avatarInitial }}</ng-template>
+        </span>
+        <span class="profile-trigger-text">
+          <strong>{{ displayName }}</strong>
+          <small>{{ auth.user?.email }}</small>
+        </span>
+        <span class="profile-chevron" [class.is-open]="isProfileOpen">⌄</span>
+      </button>
+
+      <section class="profile-dropdown" *ngIf="isProfileOpen" aria-label="ข้อมูลโปรไฟล์ผู้ใช้งาน">
+        <div class="dropdown-heading">
+          <span class="dropdown-avatar">
+            <img *ngIf="avatarUrl; else dropdownInitial" [src]="avatarUrl" alt="รูปโปรไฟล์" />
+            <ng-template #dropdownInitial>{{ avatarInitial }}</ng-template>
+          </span>
+          <div class="dropdown-identity">
+            <strong>{{ displayName }}</strong>
+            <small>{{ auth.user?.email }}</small>
+            <span class="account-role">{{ auth.isAdmin ? 'ผู้ดูแลระบบ' : 'ผู้ใช้งาน' }}</span>
+          </div>
+        </div>
+        <ng-container *ngIf="!auth.isAdmin">
+          <div class="dropdown-section-title">ข้อมูลผู้ใช้งาน</div>
+          <div class="profile-info-grid" *ngIf="profile as userProfile">
+            <div class="profile-info-item"><small>ตำแหน่ง</small><strong>{{ userProfile.position }}</strong></div>
+            <div class="profile-info-item"><small>ห้อง</small><strong>{{ userProfile.room }}</strong></div>
+            <div class="profile-info-item"><small>ชั้น</small><strong>{{ userProfile.floor }}</strong></div>
+            <div class="profile-info-item profile-info-wide"><small>ฝ่าย</small><strong>{{ userProfile.department
+                }}</strong></div>
+          </div>
+          <p class="profile-no-data" *ngIf="!profile">กำลังโหลดข้อมูลโปรไฟล์...</p>
+        </ng-container>
+        <button type="button" class="dropdown-profile-button" (click)="openProfile()">ดูโปรไฟล์</button>
+        <button type="button" class="dropdown-logout" (click)="logout()">ออกจากระบบ</button>
+      </section>
+    </div>
+    <button type="button" class="logout-button" (click)="logout()">ออกจากระบบ</button>
+  </div>
+</header>

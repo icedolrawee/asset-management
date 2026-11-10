@@ -1,0 +1,117 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #10243db8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  overflow-y: auto;
+}
+.asset-modal {
+  background: #fff;
+  border-radius: 15px;
+  width: min(760px, 100%);
+  max-height: calc(100vh - 44px);
+  overflow-y: auto;
+  box-shadow: 0 24px 80px #07172c45;
+  padding: 25px;
+}
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid #e9eef4;
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+}
+.modal-header h2 {
+  font-size: 22px;
+  color: #1c3048;
+  margin: 0;
+}
+.modal-header p:not(.eyebrow) {
+  font-size: 12px;
+  color: #8592a2;
+  margin: 7px 0 0;
+}
+.close-button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: #f1f4f8;
+  color: #5d6b7c;
+  font-size: 24px;
+  cursor: pointer;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+.field > span {
+  font-size: 12px;
+  font-weight: 650;
+  color: #43536a;
+}
+.field b {
+  color: #c54b45;
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #dbe4ed;
+  border-radius: 8px;
+  background: #fff;
+  color: #2a3b50;
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 12px;
+  outline-color: #587da5;
+}
+.field input[type='file'] {
+  padding: 8px;
+}
+.field small {
+  font-size: 10px;
+  color: #8b97a6;
+}
+.full-width {
+  grid-column: 1/-1;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #e9eef4;
+  padding-top: 18px;
+  margin-top: 20px;
+}
+.modal-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+@media (max-width: 760px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .full-width {
+    grid-column: auto;
+  }
+  .asset-modal {
+    padding: 18px;
+  }
+  .modal-backdrop {
+    padding: 10px;
+  }
+}

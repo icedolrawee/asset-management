@@ -1,0 +1,94 @@
+<div class="modal-backdrop">
+  <section
+    class="asset-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="asset-modal-title"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="modal-header">
+      <div>
+
+        <h2 id="asset-modal-title">{{ editing ? 'แก้ไขข้อมูลครุภัณฑ์' : 'เพิ่มครุภัณฑ์' }}</h2>
+        <p>
+          {{
+            editing
+              ? 'แก้ไขรายละเอียดครุภัณฑ์แล้วกดบันทึก'
+              : 'กรอกข้อมูลพื้นฐานของครุภัณฑ์ที่ต้องการบันทึก'
+          }}
+        </p>
+      </div>
+      <button type="button" class="close-button" (click)="close.emit()" aria-label="ปิด">×</button>
+    </header>
+    <form (ngSubmit)="save.emit()">
+      <div class="form-grid">
+        <label class="field full-width">
+          <span>รูปภาพครุภัณฑ์</span>
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            (change)="imageSelected.emit($event)"
+          />
+          <small>รองรับ JPG, PNG, WEBP หรือ GIF ขนาดไม่เกิน 5 MB</small>
+        </label>
+        <label class="field full-width">
+          <span>รายการครุภัณฑ์ <b>*</b></span>
+          <input
+            name="itemName"
+            [(ngModel)]="form.itemName"
+            required
+            maxlength="255"
+            placeholder="เช่น คอมพิวเตอร์ตั้งโต๊ะ"
+          />
+        </label>
+        <label class="field">
+          <span>ยี่ห้อ</span>
+          <input name="brand" [(ngModel)]="form.brand" maxlength="255" placeholder="เช่น Dell" />
+        </label>
+        <label class="field">
+          <span>รุ่น</span>
+          <input name="model" [(ngModel)]="form.model" maxlength="255" placeholder="ระบุรุ่น" />
+        </label>
+        <label class="field full-width">
+          <span>เลขครุภัณฑ์ <b>*</b></span>
+          <input
+            name="assetNumber"
+            [(ngModel)]="form.assetNumber"
+            required
+            maxlength="100"
+            placeholder="ระบุเลขครุภัณฑ์"
+          />
+        </label>
+        <label class="field full-width">
+          <span>ฝ่าย</span>
+          <input name="departmentName" [(ngModel)]="form.departmentName" list="asset-department-options" maxlength="255" placeholder="พิมพ์ชื่อฝ่าย หรือเลือกชื่อฝ่ายเดิม" />
+          <datalist id="asset-department-options">
+            <option *ngFor="let department of departments" [value]="department.name"></option>
+          </datalist>
+          <small>Admin สามารถพิมพ์ชื่อฝ่ายใหม่ได้ ระบบจะบันทึกฝ่ายให้อัตโนมัติ</small>
+        </label>
+        <label class="field">
+          <span>งบปี (พ.ศ.)</span>
+          <input name="budgetYear" type="number" inputmode="numeric" min="2400" max="3000" step="1" [(ngModel)]="form.budgetYear" placeholder="เช่น 2569" />
+        </label>
+        <label class="field">
+          <span>Serial Number <small>(ถ้ามี)</small></span>
+          <input
+            name="serialNumber"
+            [(ngModel)]="form.serialNumber"
+            maxlength="255"
+            placeholder="ระบุ Serial Number (ไม่บังคับ)"
+          />
+        </label>
+      </div>
+      <div class="alert" *ngIf="formError">{{ formError }}</div>
+      <div class="modal-actions">
+        <button type="button" class="btn-plain" (click)="close.emit()" [disabled]="saving">
+          ยกเลิก</button
+        ><button class="btn-primary" type="submit" [disabled]="saving">
+          {{ saving ? 'กำลังบันทึก...' : editing ? 'บันทึกการแก้ไข' : 'บันทึกครุภัณฑ์' }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

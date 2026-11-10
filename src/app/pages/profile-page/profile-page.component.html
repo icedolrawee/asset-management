@@ -1,0 +1,62 @@
+<div class="app-shell">
+  <app-sidebar></app-sidebar>
+  <main class="main-area">
+    <app-topbar></app-topbar>
+    <section class="page-content profile-page">
+      <div class="page-heading">
+        <div>
+          <h1>โปรไฟล์ของฉัน</h1>
+          <p class="subtitle">ข้อมูลประจำตัวผู้ใช้งานในระบบ</p>
+        </div>
+        <div class="profile-actions" *ngIf="profile">
+          <button *ngIf="!isEditing" type="button" class="profile-edit-button" (click)="startEditing()">แก้ไขข้อมูลทั้งหมด</button>
+          <ng-container *ngIf="isEditing">
+            <button type="button" class="profile-cancel-button" (click)="cancelEditing()" [disabled]="isSaving">ยกเลิก</button>
+            <button type="button" class="profile-save-button" (click)="saveProfile()" [disabled]="isSaving">{{ isSaving ? 'กำลังบันทึก...' : 'บันทึกข้อมูล' }}</button>
+          </ng-container>
+        </div>
+      </div>
+
+      <p class="profile-alert profile-alert-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <p class="profile-alert profile-alert-success" *ngIf="successMessage">{{ successMessage }}</p>
+      <div class="profile-loading" *ngIf="isLoading">กำลังโหลดข้อมูลโปรไฟล์...</div>
+
+      <section class="profile-card" *ngIf="!isLoading && profile as userProfile">
+        <div class="profile-card-header">
+          <div class="profile-avatar-editor">
+            <div class="profile-large-avatar">
+              <img *ngIf="avatarUrl; else profileInitial" [src]="avatarUrl" alt="รูปโปรไฟล์" />
+              <ng-template #profileInitial>{{ userProfile.fullName.charAt(0) }}</ng-template>
+            </div>
+            <label class="avatar-upload-button" [class.is-disabled]="isUploadingAvatar">
+              {{ isUploadingAvatar ? 'กำลังอัปโหลด...' : 'เปลี่ยนรูปโปรไฟล์' }}
+              <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onAvatarSelected($event)" [disabled]="isUploadingAvatar" />
+            </label>
+            <small>JPG, PNG หรือ WEBP · ไม่เกิน 5 MB</small>
+          </div>
+          <div class="profile-identity">
+            <h2>{{ userProfile.fullName }}</h2>
+            <p>{{ auth.user?.email }}</p>
+            <span class="profile-role">{{ auth.isAdmin ? 'ผู้ดูแลระบบ' : 'ผู้ใช้งาน' }}</span>
+          </div>
+        </div>
+
+        <div class="profile-details" *ngIf="!isEditing">
+          <div class="profile-detail"><span class="detail-icon">▣</span><div><small>ชื่อ-สกุล</small><strong>{{ userProfile.fullName }}</strong></div></div>
+          <div class="profile-detail"><span class="detail-icon">▤</span><div><small>ตำแหน่ง</small><strong>{{ userProfile.position }}</strong></div></div>
+          <div class="profile-detail"><span class="detail-icon">⌂</span><div><small>ห้อง</small><strong>{{ userProfile.room }}</strong></div></div>
+          <div class="profile-detail"><span class="detail-icon">▥</span><div><small>ชั้น</small><strong>{{ userProfile.floor }}</strong></div></div>
+          <div class="profile-detail profile-detail-wide"><span class="detail-icon">▦</span><div><small>ฝ่าย</small><strong>{{ userProfile.department }}</strong></div></div>
+        </div>
+
+        <form class="profile-edit-form" *ngIf="isEditing" (ngSubmit)="saveProfile()">
+          <label>ชื่อ-สกุล<input name="fullName" [(ngModel)]="userProfile.fullName" required maxlength="255" /></label>
+          <label>ตำแหน่ง<input name="position" [(ngModel)]="userProfile.position" required maxlength="255" /></label>
+          <label>ห้อง<input name="room" [(ngModel)]="userProfile.room" required maxlength="100" /></label>
+          <label>ชั้น<input name="floor" [(ngModel)]="userProfile.floor" required maxlength="100" /></label>
+          <label class="profile-field-wide">ฝ่าย<input name="department" [(ngModel)]="userProfile.department" required maxlength="255" /></label>
+        </form>
+      </section>
+    </section>
+  </main>
+</div>

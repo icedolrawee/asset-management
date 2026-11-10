@@ -1,0 +1,15 @@
+<aside class="sidebar">
+  <div class="brand">
+    <a class="brand-mark" routerLink="/" aria-label="ไปหน้ารายการครุภัณฑ์">
+      <img src="/images/ramkhamhaeng-logo.svg" alt="ตราสัญลักษณ์มหาวิทยาลัยรามคำแหง" />
+    </a>
+    <div>
+      <strong>ระบบครุภัณฑ์</strong><small>มหาวิทยาลัยรามคำแหง</small>
+    </div>
+  </div>
+  <div class="nav-caption">เมนูหลัก</div>
+  <a class="nav-item" routerLink="/" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="active"><span
+      class="nav-icon">▦</span> รายการครุภัณฑ์</a>
+  <a class="nav-item" routerLink="/checkouts" routerLinkActive="active"><span class="nav-icon">▤</span>
+    รายการเบิกครุภัณฑ์</a>
+</aside>

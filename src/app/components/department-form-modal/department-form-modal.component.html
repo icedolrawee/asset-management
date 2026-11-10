@@ -1,0 +1,52 @@
+<div class="modal-backdrop">
+  <section
+    class="asset-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="department-modal-title"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="modal-header">
+      <div>
+        <p class="eyebrow">NEW DEPARTMENT</p>
+        <h2 id="department-modal-title">เพิ่มแผนก</h2>
+        <p>เพิ่มแผนกเพื่อใช้จัดเก็บครุภัณฑ์</p>
+      </div>
+      <button type="button" class="close-button" (click)="close.emit()" aria-label="ปิด">×</button>
+    </header>
+    <form (ngSubmit)="save.emit()">
+      <div class="form-grid">
+        <label class="field full-width"
+          ><span>รหัสแผนก <b>*</b></span
+          ><input
+            name="departmentCode"
+            [(ngModel)]="departmentForm.code"
+            required
+            maxlength="50"
+            placeholder="เช่น IT-001" /></label
+        ><label class="field full-width"
+          ><span>ชื่อแผนก <b>*</b></span
+          ><input
+            name="departmentName"
+            [(ngModel)]="departmentForm.name"
+            required
+            maxlength="255"
+            placeholder="ระบุชื่อแผนก"
+        /></label>
+      </div>
+      <div class="alert" *ngIf="departmentFormError">{{ departmentFormError }}</div>
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="btn-plain"
+          (click)="close.emit()"
+          [disabled]="savingDepartment"
+        >
+          ยกเลิก</button
+        ><button class="btn-primary" type="submit" [disabled]="savingDepartment">
+          {{ savingDepartment ? 'กำลังบันทึก...' : 'บันทึกแผนก' }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

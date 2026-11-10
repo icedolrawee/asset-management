@@ -1,0 +1,138 @@
+<div class="app-shell">
+  <app-sidebar></app-sidebar>
+  <main class="main-area">
+    <app-topbar></app-topbar>
+    <section class="page-content">
+      <div class="page-heading">
+        <div>
+          <h1>รายการเบิกครุภัณฑ์</h1>
+          <p class="subtitle">ตรวจสอบครุภัณฑ์ที่กำลังถูกเบิกใช้งาน</p>
+        </div>
+        <div class="checkout-total">
+          <small>รายการที่เบิกอยู่</small>
+          <strong>{{ checkouts.length | number }}</strong>
+        </div>
+      </div>
+
+      <div class="alert" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <div class="success-alert" *ngIf="successMessage">{{ successMessage }}</div>
+      <section class="table-card checkout-table-card">
+        <div class="loading-state" *ngIf="loading">
+          <span class="spinner"></span>
+          <p>กำลังโหลดข้อมูล...</p>
+        </div>
+        <div class="empty-state" *ngIf="!loading && !errorMessage && checkouts.length === 0">
+          <div class="empty-icon">▤</div>
+          <strong>ยังไม่มีรายการเบิกครุภัณฑ์</strong>
+          <p>เมื่อมีการเบิกครุภัณฑ์ รายการจะแสดงที่หน้านี้</p>
+        </div>
+        <div class="table-wrap" *ngIf="!loading && checkouts.length > 0">
+          <table>
+            <thead>
+              <tr>
+                <th>ครุภัณฑ์</th>
+                <th>เลขครุภัณฑ์</th>
+                <th>Serial Number</th>
+                <th>ฝ่าย</th>
+                <th>งบปี</th>
+                <th>สถานะสภาพ</th>
+                <th>สถานะการเบิก</th>
+                <th>ผู้ใช้งาน</th>
+                <th>สถานที่</th>
+                <th>ห้อง</th>
+                <th>วันที่เบิก</th>
+                <th *ngIf="isAdmin">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let record of checkouts">
+                <td>
+                  <div class="checkout-asset">
+                    <div class="checkout-thumb">
+                      <img *ngIf="record.imagePath" [src]="'http://localhost:4000' + record.imagePath" alt="รูปครุภัณฑ์" />
+                      <span *ngIf="!record.imagePath">▧</span>
+                    </div>
+                    <strong>{{ record.itemName }}</strong>
+                  </div>
+                </td>
+                <td>{{ record.assetNumber }}</td>
+                <td class="serial">{{ record.serialNumber || record.assetNumber || '—' }}</td>
+                <td>{{ record.departmentName || '—' }}</td>
+                <td>{{ record.budgetYear || '—' }}</td>
+                <td>
+                  <select
+                    *ngIf="isAdmin"
+                    class="status-select"
+                    [ngModel]="record.status"
+                    [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="changeAssetStatus(record, $event)"
+                    aria-label="เปลี่ยนสถานะครุภัณฑ์"
+                  >
+                    <option value="ใช้งาน">ใช้งาน</option>
+                    <option value="ชำรุด">ชำรุด</option>
+                    <option value="จำหน่าย">จำหน่าย</option>
+                  </select>
+                  <span
+                    *ngIf="!isAdmin"
+                    class="status-badge"
+                    [ngClass]="
+                      record.status === 'ใช้งาน'
+                        ? 'in-use'
+                        : record.status === 'ชำรุด'
+                          ? 'broken'
+                          : 'disposed'
+                    "
+                  >
+                    {{ record.status }}
+                  </span>
+                </td>
+                <td>
+                  <span class="status-badge in-use">เบิกแล้ว</span>
+                </td>
+                <td>{{ record.borrowerName }}</td>
+                <td>{{ record.location }}</td>
+                <td>{{ record.room }}</td>
+                <td>{{ record.checkedOutAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td *ngIf="isAdmin">
+                  <div class="asset-actions">
+                    <button class="btn-plain edit-button" type="button" (click)="openEdit(record)">
+                      แก้ไข
+                    </button>
+                    <button class="btn-plain cancel-checkout-button" type="button" (click)="cancelCheckout(record)" [disabled]="cancellingCheckoutId !== null">
+                      {{ cancellingCheckoutId === record.id ? 'กำลังยกเลิก...' : 'ยกเลิกเบิก' }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer" *ngIf="!loading && checkouts.length > 0">
+          <span>แสดง {{ checkouts.length }} รายการ</span>
+        </div>
+      </section>
+    </section>
+  </main>
+</div>
+
+<div class="modal-backdrop" *ngIf="editingCheckout">
+  <section class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="edit-checkout-title" (click)="$event.stopPropagation()">
+    <div class="modal-heading">
+      <div>
+        <h2 id="edit-checkout-title">แก้ไขรายการเบิกครุภัณฑ์</h2>
+        <p>แก้ไขบัญชีผู้เบิกและสถานที่ใช้งาน</p>
+      </div>
+      <button type="button" class="modal-close" aria-label="ปิด" (click)="closeEdit()">×</button>
+    </div>
+    <form (ngSubmit)="saveEdit()">
+      <label>บัญชีผู้เบิก<select name="borrowerUserId" [(ngModel)]="editForm.borrowerUserId" required><option [ngValue]="0" disabled>เลือกบัญชีผู้ใช้งาน</option><option *ngFor="let user of checkoutUsers" [ngValue]="user.id">{{ user.displayName }} ({{ user.email }})</option></select></label>
+      <label>สถานที่<input name="location" [(ngModel)]="editForm.location" required /></label>
+      <label>ห้อง<input name="room" [(ngModel)]="editForm.room" required /></label>
+      <p class="edit-error" *ngIf="editError">{{ editError }}</p>
+      <div class="modal-actions">
+        <button type="button" class="cancel-btn" (click)="closeEdit()" [disabled]="saving">ยกเลิก</button>
+        <button type="submit" class="save-btn" [disabled]="saving">{{ saving ? 'กำลังบันทึก...' : 'บันทึกการแก้ไข' }}</button>
+      </div>
+    </form>
+  </section>
+</div>

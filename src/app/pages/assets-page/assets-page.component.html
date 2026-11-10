@@ -1,0 +1,226 @@
+<div class="app-shell">
+  <app-sidebar></app-sidebar>
+  <main class="main-area">
+    <app-topbar></app-topbar>
+    <section class="page-content">
+      <div class="page-heading">
+        <div>
+          <h1>รายการครุภัณฑ์</h1>
+          <p class="subtitle">ค้นหาและตรวจสอบข้อมูลครุภัณฑ์ในระบบ</p>
+        </div>
+        <div class="heading-actions">
+          <div class="total-card">
+            <span class="total-icon">▤</span>
+            <div>
+              <small>ครุภัณฑ์ทั้งหมด</small><strong>{{ total | number }}</strong>
+            </div>
+          </div>
+<button
+            *ngIf="auth.isAdmin"
+            class="btn-primary add-button"
+            type="button"
+            (click)="openCreateForm()"
+          >
+            ＋ เพิ่มครุภัณฑ์
+          </button>
+        </div>
+      </div>
+      <div class="success-alert" *ngIf="successMessage">{{ successMessage }}</div>
+      <section class="filter-card">
+        <div class="filter-title">
+          <strong>ค้นหาครุภัณฑ์</strong>
+          <p>ค้นหาด้วยชื่อ ยี่ห้อ รุ่น หรือ Serial Number</p>
+        </div>
+        <form class="filters" (ngSubmit)="searchAssets()">
+          <label class="search-box"
+            ><span>⌕</span
+            ><input name="search" [(ngModel)]="search" placeholder="พิมพ์คำค้นหา..." /></label
+          ><select name="status" [(ngModel)]="selectedStatus" aria-label="กรองตามสถานะ">
+            <option value="">ทุกสถานะ</option>
+            <option value="ใช้งาน">ใช้งาน</option>
+            <option value="ชำรุด">ชำรุด</option>
+            <option value="จำหน่าย">จำหน่าย</option></select>
+          <button class="btn-primary" type="submit">ค้นหา</button>
+          <button class="btn-plain" type="button" (click)="resetFilters()">ล้างตัวกรอง</button>
+        </form>
+      </section>
+      <div class="list-heading">
+        <div>
+          <h2>ข้อมูลครุภัณฑ์</h2>
+        </div>
+        <span class="count-pill">{{ total }} รายการ</span>
+      </div>
+      <div class="alert" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <section class="table-card">
+        <div class="loading-state" *ngIf="loading">
+          <span class="spinner"></span>
+          <p>กำลังโหลดข้อมูล...</p>
+        </div>
+        <div class="empty-state" *ngIf="!loading && !errorMessage && assets.length === 0">
+          <div class="empty-icon">▤</div>
+          <strong>ยังไม่มีข้อมูลครุภัณฑ์</strong>
+          <p>
+            {{
+              auth.isAdmin
+                ? 'กด “เพิ่มครุภัณฑ์” เพื่อเริ่มบันทึกรายการ'
+                : 'ยังไม่มีข้อมูลครุภัณฑ์ในระบบ'
+            }}
+          </p>
+        </div>
+        <div class="table-wrap" *ngIf="!loading && assets.length > 0">
+          <table>
+            <thead>
+              <tr>
+                <th>ครุภัณฑ์</th>
+                <th>เลขครุภัณฑ์</th>
+                <th>Serial Number</th>
+                <th>ฝ่าย</th>
+                <th>งบปี</th>
+                <th>สถานที่</th>
+                <th>สถานะสภาพ</th>
+                <th>สถานะการเบิก</th>
+                <th *ngIf="auth.isAdmin" class="actions-header">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let asset of assets; trackBy: trackById">
+                <td>
+                  <div class="asset-cell">
+                    <div class="asset-thumb">
+                      <img
+                        *ngIf="asset.imagePath"
+                        [src]="'http://localhost:4000' + asset.imagePath"
+                        alt="รูปครุภัณฑ์"
+                      /><span *ngIf="!asset.imagePath">▧</span>
+                    </div>
+                    <div>
+                      <strong>{{ asset.itemName }}</strong
+                      ><small>{{ asset.brand || 'ไม่ระบุยี่ห้อ' }} {{ asset.model || '' }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td class="serial">{{ asset.assetNumber || '—' }}</td>
+                <td class="serial">{{ asset.serialNumber || asset.assetNumber || '—' }}</td>
+                <td>{{ asset.departmentName || '—' }}</td>
+                <td>{{ asset.budgetYear || '—' }}</td>
+                <td>
+                  {{ (asset.isCheckedOut ? asset.checkoutLocation : asset.location) || asset.location || '—' }}
+                  <small class="sub-cell" *ngIf="(asset.isCheckedOut ? asset.checkoutRoom : asset.room)">ห้อง {{ (asset.isCheckedOut ? asset.checkoutRoom : asset.room) }}</small>
+                </td>
+                <td>
+                  <select
+                    *ngIf="auth.isAdmin"
+                    class="status-select"
+                    [ngModel]="asset.status"
+                    [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="changeAssetStatus(asset, $event)"
+                    aria-label="เปลี่ยนสถานะครุภัณฑ์"
+                  >
+                    <option value="ใช้งาน">ใช้งาน</option>
+                    <option value="ชำรุด">ชำรุด</option>
+                    <option value="จำหน่าย">จำหน่าย</option></select
+                  ><span
+                    *ngIf="!auth.isAdmin"
+                    class="status-badge"
+                    [ngClass]="
+                      asset.status === 'ใช้งาน'
+                        ? 'in-use'
+                        : asset.status === 'ชำรุด'
+                          ? 'broken'
+                          : 'disposed'
+                    "
+                    >{{ asset.status }}</span
+                  >
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="asset.isCheckedOut ? 'in-use' : 'broken'">{{ asset.isCheckedOut ? 'เบิกแล้ว' : 'ยังไม่เบิก' }}</span>
+                  <small class="sub-cell" *ngIf="asset.isCheckedOut && asset.borrowerName">{{ asset.borrowerName }}</small>
+                </td>
+                <td *ngIf="auth.isAdmin">
+                  <div class="asset-actions">
+                    <button class="btn-plain edit-button" type="button" *ngIf="!asset.isCheckedOut && asset.status === 'ใช้งาน'" (click)="openCheckout(asset)">เบิก</button>
+                    <button class="btn-plain edit-button" type="button" (click)="openEditForm(asset)">
+                      แก้ไข
+                    </button>
+                    <button
+                      class="btn-plain delete-button"
+                      type="button"
+                      [disabled]="deletingAssetId === asset.id"
+                      (click)="deleteAsset(asset)"
+                    >
+                      {{ deletingAssetId === asset.id ? 'กำลังลบ...' : 'ลบ' }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer" *ngIf="!loading && assets.length > 0">
+          <span>แสดง {{ (currentPage - 1) * pageSize + 1 }}–{{ (currentPage - 1) * pageSize + assets.length }} จาก {{ total }} รายการ</span>
+          <nav class="pagination" *ngIf="totalPages > 1" aria-label="เปลี่ยนหน้ารายการครุภัณฑ์">
+            <button type="button" class="page-button" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">ก่อนหน้า</button>
+            <button type="button" class="page-button" *ngFor="let page of pageNumbers" [class.current]="page === currentPage" [attr.aria-current]="page === currentPage ? 'page' : null" (click)="goToPage(page)">{{ page }}</button>
+            <button type="button" class="page-button" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">ถัดไป</button>
+          </nav>
+        </div>
+      </section>
+    </section>
+  </main>
+</div>
+<div class="modal-backdrop" *ngIf="checkoutAssetId !== null">
+  <section class="asset-modal checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div><h2 id="checkout-title">เบิกครุภัณฑ์</h2><p>กรอกข้อมูลผู้ใช้งานและสถานที่ใช้งานครุภัณฑ์</p></div>
+      <button class="close-button" type="button" (click)="closeCheckout()" aria-label="ปิด">×</button>
+    </div>
+    <form (ngSubmit)="saveCheckout()">
+      <div class="form-grid">
+        <label class="field full-width"><span>ผู้ใช้งาน <b>*</b></span><select name="borrowerUserId" [(ngModel)]="checkoutForm.borrowerUserId" required><option [ngValue]="0" disabled>เลือกบัญชีผู้ใช้งาน</option><option *ngFor="let user of checkoutUsers" [ngValue]="user.id">{{ user.displayName || user.email }}</option></select><small class="checkout-users-error" *ngIf="checkoutUsersError">{{ checkoutUsersError }}</small></label>
+        <label class="field"><span>สถานที่ <b>*</b></span><input name="checkoutLocation" [(ngModel)]="checkoutForm.location" required /></label>
+        <label class="field"><span>ห้อง <b>*</b></span><input name="checkoutRoom" [(ngModel)]="checkoutForm.room" required /></label>
+      </div>
+      <div class="alert" *ngIf="checkoutError">{{ checkoutError }}</div>
+      <div class="modal-actions">
+        <button class="btn-plain" type="button" (click)="closeCheckout()" [disabled]="checkoutSaving">ยกเลิก</button>
+        <button class="btn-primary" type="submit" [disabled]="checkoutSaving">{{ checkoutSaving ? 'กำลังบันทึก...' : 'ยืนยันการเบิก' }}</button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<div class="modal-backdrop" *ngIf="checkoutHistoryAsset">
+  <section class="asset-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-history-title" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div><h2 id="checkout-history-title">ประวัติการเบิกครุภัณฑ์</h2><p>{{ checkoutHistoryAsset.itemName }} · {{ checkoutHistoryAsset.serialNumber || checkoutHistoryAsset.assetNumber }}</p></div>
+      <button class="close-button" type="button" (click)="closeCheckoutHistory()" aria-label="ปิด">×</button>
+    </div>
+    <p *ngIf="historyLoading">กำลังโหลดประวัติ...</p>
+    <p *ngIf="!historyLoading && checkoutHistory.length === 0">ยังไม่มีประวัติการเบิก</p>
+    <div class="table-wrap" *ngIf="!historyLoading && checkoutHistory.length > 0">
+      <table>
+        <thead><tr><th>ผู้ใช้งาน</th><th>เลขครุภัณฑ์</th><th>สถานที่ / ห้อง</th><th>วันที่เบิก</th><th>ผู้บันทึก</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let record of checkoutHistory">
+            <td>{{ record.borrowerName }}</td><td>{{ record.assetNumber }}</td>
+            <td>{{ record.location }} / {{ record.room }}</td>
+            <td>{{ record.checkedOutAt | date:'dd/MM/yyyy HH:mm' }}</td><td>{{ record.checkedOutBy }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-actions"><button class="btn-plain" type="button" (click)="closeCheckoutHistory()">ปิด</button></div>
+  </section>
+</div>
+
+<app-asset-form-modal
+  *ngIf="showCreateForm"
+  [form]="form"
+  [departments]="departments"
+  [saving]="saving"
+  [editing]="editingAssetId !== null"
+  [formError]="formError"
+  (close)="closeCreateForm()"
+  (save)="saveAsset()"
+  (imageSelected)="onImageSelected($event)"
+></app-asset-form-modal>

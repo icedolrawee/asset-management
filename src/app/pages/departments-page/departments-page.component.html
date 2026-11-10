@@ -1,0 +1,39 @@
+<div class="app-shell">
+  <app-sidebar></app-sidebar>
+  <main class="main-area">
+    <app-topbar></app-topbar>
+    <section class="page-content">
+      <div class="page-heading"><div><h1>จัดการฝ่าย</h1><p class="subtitle">เพิ่มและกำหนดฝ่ายให้ครุภัณฑ์และผู้ใช้งาน</p></div></div>
+      <div class="alert" *ngIf="error">{{ error }}</div>
+      <div class="success-alert" *ngIf="success">{{ success }}</div>
+      <section class="filter-card" *ngIf="auth.isAdmin">
+        <div class="filter-title"><strong>{{ editingId ? 'แก้ไขฝ่าย' : 'เพิ่มฝ่ายใหม่' }}</strong><p>กำหนดรหัสและชื่อฝ่าย</p></div>
+        <form class="filters" (ngSubmit)="save()">
+          <input name="code" [(ngModel)]="form.code" required maxlength="50" placeholder="รหัสฝ่าย เช่น IT-001" />
+          <input name="name" [(ngModel)]="form.name" required maxlength="255" placeholder="ชื่อฝ่าย" />
+          <button class="btn-primary" type="submit" [disabled]="saving">{{ saving ? 'กำลังบันทึก...' : 'บันทึกฝ่าย' }}</button>
+          <button class="btn-plain" type="button" *ngIf="editingId" (click)="reset()">ยกเลิก</button>
+        </form>
+      </section>
+      <section class="table-card">
+        <div class="loading-state" *ngIf="loading">กำลังโหลดข้อมูล...</div>
+        <div class="table-wrap" *ngIf="!loading">
+          <table><thead><tr><th>รหัสฝ่าย</th><th>ชื่อฝ่าย</th><th>สถานะ</th><th *ngIf="auth.isAdmin">จัดการ</th></tr></thead>
+            <tbody><tr *ngFor="let d of departments"><td>{{ d.code }}</td><td>{{ d.name }}</td><td>{{ d.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}</td>
+              <td *ngIf="auth.isAdmin"><button class="btn-plain" type="button" (click)="edit(d)">แก้ไข</button> <button class="btn-plain" type="button" (click)="toggleActive(d)">{{ d.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน' }}</button></td>
+            </tr><tr *ngIf="departments.length === 0"><td [attr.colspan]="auth.isAdmin ? 4 : 3">ยังไม่มีข้อมูลฝ่าย</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="table-card" *ngIf="auth.isAdmin">
+        <div class="filter-title"><strong>กำหนดฝ่ายให้ผู้ใช้งาน</strong><p>ผู้ใช้งานหนึ่งคนสามารถสังกัดได้หลายฝ่าย</p></div>
+        <div class="table-wrap"><table><thead><tr><th>ผู้ใช้งาน</th><th>ฝ่ายที่สังกัด</th><th>จัดการ</th></tr></thead>
+          <tbody><tr *ngFor="let user of users"><td>{{ user.displayName }}<small class="sub-cell">{{ user.email }}</small></td>
+            <td><div class="department-options"><label *ngFor="let d of departments"><input type="checkbox" [checked]="(assignments[user.id] || []).includes(d.id)" (change)="toggleAssignment(user.id, d.id, $any($event.target).checked)" /> {{ d.name }}</label></div></td>
+            <td><button class="btn-primary" type="button" (click)="saveAssignments(user)">บันทึก</button></td>
+          </tr><tr *ngIf="users.length === 0"><td colspan="3">ไม่พบผู้ใช้งาน</td></tr></tbody>
+        </table></div>
+      </section>
+    </section>
+  </main>
+</div>
